@@ -21,6 +21,15 @@ jobs:
       - run:
           name: "Say hello"
           command: "echo Hello, World!"
+          
+  test:
+    docker:
+      - image: cimg/base:current
+    steps:
+      - checkout
+      - run:
+          name: "Run tests"
+          command: "echo Running tests..."
 
 # Orchestrate jobs using workflows
 # See: https://circleci.com/docs/guides/orchestrate/workflows/ & https://circleci.com/docs/reference/configuration-reference/#workflows
