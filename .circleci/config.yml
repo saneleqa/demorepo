@@ -21,25 +21,38 @@ jobs:
       - run:
           name: "Say hello"
           command: "echo Hello, World!"
-
+ 
   test:
     docker:
       # 1. Switch to an image that has Node.js and npm pre-installed
       - image: cimg/node:lts
     steps:
       - checkout
-
-      # 2. Install your project dependencies (reads your package.json)
+      
+      # 2. Ask CircleCI if we already have these files saved from last time
+      - restore_cache:
+          keys:
+            - v1-deps-{{ checksum "package-lock.json" }}
+          
+      # 3. Install dependencies (will be super fast if cached)
       - run:
           name: "Install Node Dependencies"
-          command: "npm install"
-
-      # 3. Install Playwright browsers and necessary Linux system dependencies
+          command: "npm ci"
+          
+      # 4. Install Playwright (will skip downloading if already in cache)
       - run:
           name: "Install Playwright Browsers"
           command: "npx playwright install --with-deps"
 
-      # 4. Run the actual tests
+      # 5. Save the downloaded files to the cache for NEXT time
+      - save_cache:
+          key: v1-deps-{{ checksum "package-lock.json" }}
+          paths:
+            - ~/.npm
+            - ~/.cache/ms-playwright
+            - node_modules
+            
+      # 6. Run the actual tests
       - run:
           name: "Run tests"
           command: "npx playwright test"
