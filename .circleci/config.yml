@@ -21,15 +21,28 @@ jobs:
       - run:
           name: "Say hello"
           command: "echo Hello, World!"
-          
-  test:
+
+   test:
     docker:
-      - image: cimg/base:current
+      # 1. Switch to an image that has Node.js and npm pre-installed
+      - image: cimg/node:lts
     steps:
       - checkout
+      
+      # 2. Install your project dependencies (reads your package.json)
+      - run:
+          name: "Install Node Dependencies"
+          command: "npm install"
+          
+      # 3. Install Playwright browsers and necessary Linux system dependencies
+      - run:
+          name: "Install Playwright Browsers"
+          command: "npx playwright install --with-deps"
+          
+      # 4. Run the actual tests
       - run:
           name: "Run tests"
-          command: "npm test"
+          command: "npx playwright test"       
 
 # Orchestrate jobs using workflows
 # See: https://circleci.com/docs/guides/orchestrate/workflows/ & https://circleci.com/docs/reference/configuration-reference/#workflows
